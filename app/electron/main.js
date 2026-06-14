@@ -9,15 +9,33 @@ const { createSession } = require('../session');
 const launcher = require('../launcher');
 const { localIps } = require('../util');
 const network = require('../network');
+const P = require('../paths');
+
+let autoUpdater = null;
+try { ({ autoUpdater } = require('electron-updater')); } catch (_) { /* dev : pas installé */ }
 
 let win = null;
 let session = null;
 
+// Auto-update via GitHub Releases — actif UNIQUEMENT sur une app installée (pas en dev/portable).
+function setupAutoUpdate() {
+  if (!autoUpdater || !app.isPackaged) return;
+  try {
+    autoUpdater.autoDownload = true;
+    autoUpdater.autoInstallOnAppQuit = true;
+    const send = (u) => { if (win && win.webContents) win.webContents.send('update', u); };
+    autoUpdater.on('update-available', (i) => send({ state: 'available', version: i.version }));
+    autoUpdater.on('download-progress', (p) => send({ state: 'progress', percent: Math.round(p.percent) }));
+    autoUpdater.on('update-downloaded', (i) => send({ state: 'ready', version: i.version }));
+    autoUpdater.on('error', (e) => send({ state: 'error', message: String((e && e.message) || e) }));
+    autoUpdater.checkForUpdates();
+  } catch (_) {}
+}
+
 // Repart sur une équipe propre à chaque démarrage de l'app (efface les évènements précédents).
 function resetData() {
-  const dataDir = path.resolve(__dirname, '..', '..', 'data');
-  try { fs.writeFileSync(path.join(dataDir, 'soulsync_events.jsonl'), ''); } catch (_) {}
-  try { fs.rmSync(path.join(dataDir, 'soulsync_state.json'), { force: true }); } catch (_) {}
+  try { fs.writeFileSync(P.EVENTS_FILE, ''); } catch (_) {}
+  try { fs.rmSync(P.STATE_FILE, { force: true }); } catch (_) {}
 }
 
 function createWindow() {
@@ -65,7 +83,7 @@ if (!app.requestSingleInstanceLock()) {
   });
   app.on('open-url', (_e, url) => handleDeepLink(url)); // macOS
   pendingDeepLink = extractLink(process.argv);
-  app.whenReady().then(() => { resetData(); createWindow(); });
+  app.whenReady().then(() => { resetData(); createWindow(); setupAutoUpdate(); });
 }
 app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 app.on('window-all-closed', () => {
@@ -76,7 +94,7 @@ app.on('window-all-closed', () => {
 
 ipcMain.handle('start-session', (_e, cfg) => {
   if (session) { try { session.close(); } catch (_) {} session = null; }
-  const eventsFile = path.resolve(__dirname, '..', '..', 'data', 'soulsync_events.jsonl');
+  const eventsFile = P.EVENTS_FILE;
   try {
     session = createSession({ ...cfg, eventsFile });
   } catch (err) {
@@ -130,6 +148,9 @@ function arrangeWindows() {
 }
 
 ipcMain.handle('arrange-windows', () => { arrangeWindows(); return { ok: true }; });
+
+// Applique la mise à jour déjà téléchargée (quitte et réinstalle).
+ipcMain.handle('install-update', () => { try { if (autoUpdater) autoUpdater.quitAndInstall(); } catch (_) {} return { ok: true }; });
 
 ipcMain.handle('host-info', () => ({ ips: localIps(), port: 58787 }));
 

@@ -30,5 +30,8 @@ contextBridge.exposeInMainWorld('soulsync', {
   onConn: (cb) => ipcRenderer.on('conn', (_e, info) => cb(info)),
   onGameStarting: (cb) => ipcRenderer.on('game-starting', () => cb()),
   onRandoDone: (cb) => ipcRenderer.on('rando-done', (_e, res) => cb(res)),
-  onDeepLink: (cb) => ipcRenderer.on('deeplink', (_e, url) => cb(url))
+  onDeepLink: (cb) => ipcRenderer.on('deeplink', (_e, url) => cb(url)),
+  // Auto-update
+  onUpdate: (cb) => ipcRenderer.on('update', (_e, u) => cb(u)),
+  installUpdate: () => ipcRenderer.invoke('install-update')
 });

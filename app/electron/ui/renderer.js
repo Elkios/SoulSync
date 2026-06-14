@@ -453,6 +453,7 @@ if (window.soulsync) {
     render();
   });
   window.soulsync.onConn((info) => { if (uiMode === 'client') setLobbyConn(info.state, info.message); });
+  if (window.soulsync.onUpdate) window.soulsync.onUpdate(handleUpdate);
   window.soulsync.onGameStarting(() => showRando("🎲 L'hôte a lancé — randomisation…"));
   window.soulsync.onRandoDone((res) => {
     if (res && res.ok) { setRando("✅ C'est parti !"); goDashboard(); setTimeout(hideRando, 2600); }
@@ -622,6 +623,26 @@ function toast(cls, txt) {
   el.textContent = txt;
   $('#toasts').appendChild(el);
   setTimeout(() => el.remove(), 5200);
+}
+
+// ---------- AUTO-UPDATE ----------
+function handleUpdate(u) {
+  if (!u) return;
+  if (u.state === 'available') toast('catch', '⬇️ Mise à jour v' + (u.version || '') + ' en téléchargement…');
+  else if (u.state === 'ready') showUpdateBanner(u.version);
+  // 'progress' / 'error' : silencieux (pas de réseau = on ne dérange pas)
+}
+function showUpdateBanner(version) {
+  if (document.getElementById('update-banner')) return;
+  const b = document.createElement('div');
+  b.id = 'update-banner';
+  b.className = 'update-banner';
+  b.innerHTML = '<span>✅ Mise à jour ' + (version ? ('v' + esc(version) + ' ') : '') + 'prête !</span>' +
+    '<button id="update-restart">🔄 Redémarrer maintenant</button>' +
+    '<button id="update-later" title="Plus tard">✕</button>';
+  document.body.appendChild(b);
+  document.getElementById('update-restart').onclick = () => { if (window.soulsync && window.soulsync.installUpdate) window.soulsync.installUpdate(); };
+  document.getElementById('update-later').onclick = () => b.remove();
 }
 
 function showGameOver(playerId) {

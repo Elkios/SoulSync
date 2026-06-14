@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "private": true,
   "description": "SoulSync - moteur de regles Nuzlocke/Soul Link + pont vers le tracker Lua",
-  "main": "watch.js",
+  "main": "electron/main.js",
   "scripts": {
     "watch": "node watch.js",
     "host": "node host.js",
@@ -11,13 +11,55 @@
     "ui": "electron electron/main.js",
     "test": "node test.js",
     "test:rules": "node test-rules.js",
-    "test:net": "node test-net.js"
+    "test:net": "node test-net.js",
+    "dist": "electron-builder",
+    "publish": "electron-builder --publish always"
   },
   "dependencies": {
+    "electron-updater": "^6.8.9",
     "nat-api": "^0.3.1",
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "electron": "^42.4.0"
+    "electron": "^42.4.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.soulsync.app",
+    "productName": "SoulSync",
+    "directories": {
+      "output": "../dist"
+    },
+    "files": [
+      "**/*",
+      "!test*.js",
+      "!_*.js",
+      "!preview-server.js",
+      "!**/*.map",
+      "!randomizer/**",
+      "!data/**",
+      "!saves/**"
+    ],
+    "extraResources": [
+      { "from": "../tracker", "to": "tracker" },
+      { "from": "../tools/upr", "to": "tools/upr" },
+      { "from": "../tools/preset/out", "to": "tools/preset/out" },
+      { "from": "../jre", "to": "jre" },
+      { "from": "../BizHawk-2.11.1-win-x64", "to": "BizHawk-2.11.1-win-x64" }
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "SoulSync-Setup-${version}.exe"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "Elkios",
+      "repo": "SoulSync"
+    }
   }
 }

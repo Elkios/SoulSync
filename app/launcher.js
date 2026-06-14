@@ -6,49 +6,51 @@
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const P = require('./paths');
 
-const ROOT = path.resolve(__dirname, '..');
-const JAR = path.join(ROOT, 'tools', 'upr', 'PokeRandoZX.jar');
-const PRESET = path.join(ROOT, 'app', 'randomizer', 'soulsync-preset.rnqs');
-const TRACKER = path.join(ROOT, 'tracker', 'soulsync_tracker.lua');
+const RES = P.RES;                  // ressources lecture seule
+const JAR = P.JAR;
+const PRESET = P.PRESET;            // preset généré (modifiable)
+const TRACKER_SRC = P.TRACKER_SRC;  // modèle du tracker (lecture seule)
+const TRACKER_RUN = P.TRACKER_RUN;  // copie réécrite + lancée par BizHawk (modifiable)
 
-// Réécrit les chemins ABSOLUS du tracker Lua (OUT_DIR + SPECIES_FILE) pour qu'ils
-// pointent vers le dossier de CETTE machine (sinon le Lua écrit dans un chemin
-// codé en dur qui n'existe pas chez les autres → aucune sync).
+// Lit le modèle du tracker, réécrit ses chemins ABSOLUS (OUT_DIR + SPECIES_FILE) pour
+// CETTE machine, et écrit une COPIE exécutable dans le dossier de données (modifiable
+// même quand l'app est installée en lecture seule). BizHawk lance cette copie.
 function prepareTracker() {
   try {
-    let lua = fs.readFileSync(TRACKER, 'utf8');
-    const dataDir = path.join(ROOT, 'data') + path.sep;
-    const speciesFile = path.join(ROOT, 'tracker', 'species_fr.lua');
+    let lua = fs.readFileSync(TRACKER_SRC, 'utf8');
+    const dataDir = P.DATA_DIR + path.sep;
+    const speciesFile = P.SPECIES_FILE;
     lua = lua.replace(/local OUT_DIR = \[\[[^\]]*\]\]/, 'local OUT_DIR = [[' + dataDir + ']]');
     lua = lua.replace(/local SPECIES_FILE = \[\[[^\]]*\]\]/, 'local SPECIES_FILE = [[' + speciesFile + ']]');
-    fs.writeFileSync(TRACKER, lua);
+    fs.writeFileSync(TRACKER_RUN, lua);
   } catch (_) {}
 }
 
 // Trouve l'exécutable Java : JRE embarqué (jre/bin/java.exe) en priorité, sinon le 'java' du système.
 function findJava() {
-  const bundled = path.join(ROOT, 'jre', 'bin', 'java.exe');
+  const bundled = path.join(RES, 'jre', 'bin', 'java.exe');
   if (fs.existsSync(bundled)) return bundled;
   return 'java';
 }
 
 // Trouve EmuHawk.exe : dossier embarqué "emulator/", sinon un dossier "BizHawk-*/".
 function findEmu() {
-  const bundled = path.join(ROOT, 'emulator', 'EmuHawk.exe');
+  const bundled = path.join(RES, 'emulator', 'EmuHawk.exe');
   if (fs.existsSync(bundled)) return bundled;
   try {
-    for (const d of fs.readdirSync(ROOT)) {
+    for (const d of fs.readdirSync(RES)) {
       if (/^BizHawk/i.test(d)) {
-        const exe = path.join(ROOT, d, 'EmuHawk.exe');
+        const exe = path.join(RES, d, 'EmuHawk.exe');
         if (fs.existsSync(exe)) return exe;
       }
     }
   } catch (_) {}
-  return path.join(ROOT, 'BizHawk-2.11.1-win-x64', 'EmuHawk.exe');
+  return path.join(RES, 'BizHawk-2.11.1-win-x64', 'EmuHawk.exe');
 }
-const OUT_ROM = path.join(ROOT, 'roms', 'soulsync-randomized.nds');
-const CONFIG = path.join(ROOT, 'app', 'randomizer', 'config.json');
+const OUT_ROM = path.join(P.ROMS_DIR, 'soulsync-randomized.nds');
+const CONFIG = P.CONFIG;
 
 function readConfig() {
   try { return JSON.parse(fs.readFileSync(CONFIG, 'utf8')); } catch (_) { return {}; }
@@ -62,7 +64,7 @@ function checkEnv() {
   if (!fs.existsSync(JAR)) missing.push('UPR (randomizer)');
   if (!fs.existsSync(PRESET)) missing.push('preset de randomisation');
   if (!fs.existsSync(findEmu())) missing.push('BizHawk');
-  if (!fs.existsSync(TRACKER)) missing.push('tracker Lua');
+  if (!fs.existsSync(TRACKER_SRC)) missing.push('tracker Lua');
   return missing;
 }
 
@@ -94,7 +96,7 @@ function randomizeAndPlay(romPath, onLog) {
       onLog('✅ ROM randomisée — lancement du jeu…');
       prepareTracker(); // chemins du tracker corrects pour CETTE machine
       try {
-        const emu = spawn(findEmu(), [OUT_ROM, '--lua=' + TRACKER], { detached: true, stdio: 'ignore' });
+        const emu = spawn(findEmu(), [OUT_ROM, '--lua=' + TRACKER_RUN], { detached: true, stdio: 'ignore' });
         emu.unref();
         resolve({ ok: true });
       } catch (ex) {
@@ -104,8 +106,8 @@ function randomizeAndPlay(romPath, onLog) {
   });
 }
 
-const PRESET_CLASSES = path.join(ROOT, 'tools', 'preset', 'out');
-const PRESET_PROPS = path.join(ROOT, 'app', 'randomizer', 'soulsync-preset.properties');
+const PRESET_CLASSES = P.PRESET_CLASSES;
+const PRESET_PROPS = P.PRESET_PROPS;
 
 // Écrit la config full-custom en fichier .properties (clé=valeur) lu par GenPreset.
 // config = objet plat { "mode.wild":1, "flag.shinyChance":true, "int.trainersLevelModifier":20, "miscTweaks":512, ... }
@@ -158,8 +160,8 @@ function writePreset(b64) {
 }
 
 // ----------------- SAUVEGARDE / REPRISE DE PARTIE -----------------
-const SAVES_DIR = path.join(ROOT, 'saves');
-const EVENTS_FILE = path.join(ROOT, 'data', 'soulsync_events.jsonl');
+const SAVES_DIR = P.SAVES_DIR;
+const EVENTS_FILE = P.EVENTS_FILE;
 
 // Emplacement de la sauvegarde DANS le jeu (SRAM) gérée par BizHawk pour notre ROM.
 function saveRamPath() {
@@ -219,7 +221,7 @@ function resumePlay(onLog) {
     onLog('▶️ Reprise de la partie…');
     prepareTracker();
     try {
-      const emu = spawn(findEmu(), [OUT_ROM, '--lua=' + TRACKER], { detached: true, stdio: 'ignore' });
+      const emu = spawn(findEmu(), [OUT_ROM, '--lua=' + TRACKER_RUN], { detached: true, stdio: 'ignore' });
       emu.unref();
       resolve({ ok: true });
     } catch (ex) { resolve({ ok: false, error: 'Lancement BizHawk : ' + ex.message }); }
@@ -229,5 +231,5 @@ function resumePlay(onLog) {
 module.exports = {
   randomizeAndPlay, generatePreset, writePreset, resumePlay,
   saveGame, listSaves, loadGame, sanitizeId,
-  readConfig, writeConfig, ROMS_DIR: path.join(ROOT, 'roms')
+  readConfig, writeConfig, ROMS_DIR: P.ROMS_DIR
 };

@@ -24,6 +24,8 @@ emulator/
 #      pour tourner chez les potes (pas de JDK chez eux, juste le JRE).
 
 # Config locale (chemin ROM perso) + presets générés (régénérés par l'app)
+# (en dev/portable, ces données vont dans /randomizer, /data, /saves, /roms à la racine)
+/randomizer/
 app/randomizer/config.json
 app/randomizer/soulsync-preset.rnqs
 app/randomizer/soulsync-preset.properties
@@ -41,6 +43,7 @@ saves/
 # Build / sortie
 SoulSync-Portable.zip
 *.zip
+dist/
 
 # Node
 node_modules/
