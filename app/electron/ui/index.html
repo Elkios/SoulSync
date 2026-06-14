@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' https://raw.githubusercontent.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com 'self';" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <title>SoulSync</title>
+</head>
+<body>
+
+  <!-- INTRO (logo animé + jingle 8-bit) -->
+  <section id="intro" class="intro">
+    <div class="intro-stage">
+      <img src="logo.svg" class="intro-emblem" alt="" />
+      <div class="intro-word"><span class="logo-soul">Soul</span><span class="logo-sync">Sync</span></div>
+      <div class="intro-sub">NUZLOCKE · SOUL LINK · RANDOMIZER</div>
+    </div>
+    <div class="intro-prompt">▶ Appuie pour commencer</div>
+    <div class="intro-flash"></div>
+  </section>
+
+  <!-- ÉCRAN DE SETUP -->
+  <section id="setup" class="view">
+    <div class="logo">
+      <img src="logo.svg" class="emblem" alt="" />
+      <div class="wordmark"><span class="logo-soul">Soul</span><span class="logo-sync">Sync</span></div>
+      <div class="logo-sub">Nuzlocke · Soul Link · Randomizer</div>
+    </div>
+
+    <div class="card setup-card">
+      <label class="field">
+        <span>Ton pseudo</span>
+        <input id="pseudo" type="text" placeholder="ex : mathys" maxlength="16" />
+      </label>
+
+      <div class="mode-cards">
+        <button id="m-host" class="mode-card"><span class="mc-ico">🖥️</span><span class="mc-t">Héberger</span><span class="mc-d">Crée la partie, invite tes potes</span></button>
+        <button id="m-join" class="mode-card"><span class="mc-ico">🔗</span><span class="mc-t">Rejoindre</span><span class="mc-d">Connecte-toi à un hôte</span></button>
+        <button id="m-solo" class="mode-card"><span class="mc-ico">🎮</span><span class="mc-t">Solo</span><span class="mc-d">Joue seul dans ton coin</span></button>
+      </div>
+
+      <div id="join-row" class="join-row" style="display:none">
+        <input id="hostip" type="text" placeholder="IP:port de l'hôte (ex 192.168.1.20:58787)" />
+        <button id="join-go" class="big-btn">Rejoindre</button>
+      </div>
+
+      <div id="setup-log" class="setup-log"></div>
+    </div>
+  </section>
+
+  <!-- LOBBY -->
+  <section id="lobby" class="view hidden">
+    <header class="topbar">
+      <div class="brand"><img src="logo.svg" class="brand-emblem" alt="" /><span class="logo-soul">Soul</span><span class="logo-sync">Sync</span></div>
+      <div class="status"><span id="lobby-role" class="pill">Lobby</span><span id="lobby-me" class="pill pill-me">—</span><span id="lobby-conn" class="pill pill-conn">…</span></div>
+    </header>
+    <main class="lobby-main">
+      <div class="lobby-grid">
+        <div class="lobby-col">
+          <div id="share-box" class="share-box hidden">
+            <div class="share-label">🔗 Lien à partager (1 clic = ton pote rejoint) :</div>
+            <div id="share-link" class="share-ip">Analyse du réseau…</div>
+            <button id="copy-link" class="pill rom-btn" style="margin-top:8px">📋 Copier le lien</button>
+            <div class="net-diag">
+              <div class="net-row" id="net-lan"></div>
+              <div class="net-row" id="net-tailscale"></div>
+              <div class="net-row" id="net-internet"></div>
+            </div>
+            <div id="net-hint" class="net-hint"></div>
+          </div>
+          <div class="lobby-section-title">Joueurs</div>
+          <div id="player-list" class="player-list"></div>
+          <button id="lobby-rom" class="big-btn alt">📁 Choisir ma ROM</button>
+          <div id="rom-name" class="rom-name"></div>
+        </div>
+        <div class="lobby-col">
+          <div id="resume-section" class="resume-section hidden">
+            <div class="lobby-section-title">📂 Reprendre une partie</div>
+            <div id="resume-list" class="resume-list"></div>
+          </div>
+          <div class="lobby-section-title">📜 Règles du jeu <span id="rules-who" class="settings-who"></span></div>
+          <div id="rules-list" class="rules-list"></div>
+          <div class="lobby-section-title">🎲 Randomizer — full custom <span id="settings-who" class="settings-who"></span></div>
+          <div id="settings-list" class="settings-list"></div>
+          <button id="lobby-play" class="big-btn">🎲 Jouer (tous)</button>
+          <div id="lobby-wait" class="lobby-wait hidden">⏳ En attente que l'hôte lance la partie…</div>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="view hidden">
+    <header class="topbar">
+      <div class="brand"><img src="logo.svg" class="brand-emblem" alt="" /><span class="logo-soul">Soul</span><span class="logo-sync">Sync</span></div>
+      <div class="status">
+        <button id="rom-btn" class="pill rom-btn" title="Choisir ta ROM de base">📁 ROM</button>
+        <button id="play-btn" class="play-btn">🎲 Randomiser &amp; Jouer</button>
+        <button id="arrange-btn" class="pill rom-btn" title="Ranger les fenêtres côte à côte">🗖 Ranger</button>
+        <button id="protect-btn" class="pill rom-btn" title="Protection 1er combat : les morts ne comptent pas tant que c'est actif" style="display:none">🛡️ 1er combat</button>
+        <button id="save-btn" class="pill rom-btn" title="Sauvegarder la partie en cours" style="display:none">💾 Sauvegarder</button>
+        <button id="mute-btn" class="pill rom-btn" title="Couper / activer le son">🔊</button>
+        <span id="role-tag" class="pill">—</span>
+        <span id="me-tag" class="pill pill-me">—</span>
+        <span id="conn-tag" class="pill pill-conn">…</span>
+      </div>
+    </header>
+
+    <main id="board" class="board">
+      <div class="empty-hint">En attente des équipes… capture ton premier Pokémon 🎮</div>
+    </main>
+
+    <!-- GAME OVER -->
+    <div id="gameover" class="gameover hidden">
+      <div class="gameover-inner">
+        <div class="go-skull">☠️</div>
+        <div class="go-title">GAME OVER</div>
+        <div id="go-sub" class="go-sub"></div>
+        <button id="go-restart" class="big-btn" style="display:none">🎲 Recommencer (nouvelle seed)</button>
+        <button id="go-close" class="big-btn alt">Fermer</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Overlays globaux (visibles depuis n'importe quel écran) -->
+  <div id="save-modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-title">💾 Sauvegarder la partie</div>
+      <input id="save-name" type="text" placeholder="Nom (ex : Run du mardi)" maxlength="40" />
+      <div class="modal-hint">⚠️ Sauvegarde D'ABORD dans le jeu (menu Pokémon → Sauver) pour garder ta progression.</div>
+      <div class="modal-btns">
+        <button id="save-cancel" class="big-btn alt">Annuler</button>
+        <button id="save-ok" class="big-btn">Sauvegarder</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts" class="toasts"></div>
+  <div id="rando" class="rando hidden">
+    <div class="rando-inner">
+      <div class="rando-spin">🎲</div>
+      <div id="rando-msg" class="rando-msg">Préparation…</div>
+      <div class="rando-hint">La première fois peut être plus longue. Ne ferme pas la fenêtre.</div>
+    </div>
+  </div>
+
+  <script src="audio.js"></script>
+  <script src="intro.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SoulSync">
+  <defs>
+    <linearGradient id="gp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff8aa0"/>
+      <stop offset="1" stop-color="#ff5470"/>
+    </linearGradient>
+    <linearGradient id="gc" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#74e6ef"/>
+      <stop offset="1" stop-color="#36d1dc"/>
+    </linearGradient>
+    <linearGradient id="gg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe49a"/>
+      <stop offset="1" stop-color="#ffd166"/>
+    </linearGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.45"/>
+    </filter>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="clipL"><circle cx="92" cy="100" r="56"/></clipPath>
+    <clipPath id="clipR"><circle cx="228" cy="100" r="56"/></clipPath>
+  </defs>
+
+  <!-- POKE BALL GAUCHE (soul / rose) -->
+  <g filter="url(#soft)">
+    <g clip-path="url(#clipL)">
+      <rect x="36" y="44" width="112" height="112" fill="#f4f7ff"/>
+      <rect x="36" y="44" width="112" height="56" fill="url(#gp)"/>
+      <rect x="36" y="92" width="112" height="16" fill="#11192c"/>
+    </g>
+    <circle cx="92" cy="100" r="56" fill="none" stroke="#0b1120" stroke-width="6"/>
+    <circle cx="92" cy="100" r="16" fill="#f4f7ff" stroke="#0b1120" stroke-width="5"/>
+    <circle cx="92" cy="100" r="6.5" fill="#cdd8ee"/>
+  </g>
+
+  <!-- POKE BALL DROITE (sync / cyan) -->
+  <g filter="url(#soft)">
+    <g clip-path="url(#clipR)">
+      <rect x="172" y="44" width="112" height="112" fill="#f4f7ff"/>
+      <rect x="172" y="44" width="112" height="56" fill="url(#gc)"/>
+      <rect x="172" y="92" width="112" height="16" fill="#11192c"/>
+    </g>
+    <circle cx="228" cy="100" r="56" fill="none" stroke="#0b1120" stroke-width="6"/>
+    <circle cx="228" cy="100" r="16" fill="#f4f7ff" stroke="#0b1120" stroke-width="5"/>
+    <circle cx="228" cy="100" r="6.5" fill="#cdd8ee"/>
+  </g>
+
+  <!-- MAILLON DE CHAINE (le lien) -->
+  <g filter="url(#glow)">
+    <rect x="132" y="83" width="36" height="34" rx="17" fill="none" stroke="url(#gg)" stroke-width="9"/>
+    <rect x="152" y="83" width="36" height="34" rx="17" fill="none" stroke="#ffffff" stroke-width="9"/>
+  </g>
+</svg>

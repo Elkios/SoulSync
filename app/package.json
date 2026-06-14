@@ -1,0 +1,23 @@
+{
+  "name": "soulsync",
+  "version": "0.2.0",
+  "private": true,
+  "description": "SoulSync - moteur de regles Nuzlocke/Soul Link + pont vers le tracker Lua",
+  "main": "watch.js",
+  "scripts": {
+    "watch": "node watch.js",
+    "host": "node host.js",
+    "join": "node client.js",
+    "ui": "electron electron/main.js",
+    "test": "node test.js",
+    "test:rules": "node test-rules.js",
+    "test:net": "node test-net.js"
+  },
+  "dependencies": {
+    "nat-api": "^0.3.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "electron": "^42.4.0"
+  }
+}

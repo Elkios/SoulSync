@@ -1,0 +1,54 @@
+# ROMs — jamais versionnées ni distribuées (copyright)
+roms/
+*.nds
+*.nds.bak
+
+# Sauvegardes émulateur
+*.sav
+*.dsv
+*.ram
+*.State
+*.bk2
+
+# Émulateur (téléchargé séparément)
+BizHawk-*/
+DeSmuME*/
+
+# Outils embarqués LOURDS / tiers (téléchargés, pas versionnés ; livrés via le zip portable)
+jre/
+tools/upr/
+tools/jre*/
+emulator/
+
+# NB : tools/preset/out/ (le .class GenPreset compilé) EST versionné -> indispensable
+#      pour tourner chez les potes (pas de JDK chez eux, juste le JRE).
+
+# Config locale (chemin ROM perso) + presets générés (régénérés par l'app)
+app/randomizer/config.json
+app/randomizer/soulsync-preset.rnqs
+app/randomizer/soulsync-preset.properties
+
+# Réglages Claude locaux (permissions machine)
+.claude/settings.local.json
+
+# Données runtime (échange Lua <-> app)
+data/*
+!data/.gitkeep
+
+# Sauvegardes de parties (locales à chaque machine)
+saves/
+
+# Build / sortie
+SoulSync-Portable.zip
+*.zip
+
+# Node
+node_modules/
+npm-debug.log*
+
+# OS / éditeurs
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+*.log
