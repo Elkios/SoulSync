@@ -8,10 +8,12 @@
     "watch": "node watch.js",
     "host": "node host.js",
     "join": "node client.js",
+    "relay": "node relay.js",
     "ui": "electron electron/main.js",
     "test": "node test.js",
     "test:rules": "node test-rules.js",
     "test:net": "node test-net.js",
+    "test:relay": "node test-relay.js",
     "dist": "electron-builder",
     "publish": "electron-builder --publish always"
   },
