@@ -82,8 +82,7 @@ const RANDO_GROUPS = [
   { title: '⚙️ Réglages divers', items: [
     { type: 'tweak', key: 'challengeMode', bit: 512, label: '🔥 Mode Difficile (Challenge Mode)', def: false },
     { type: 'tweak', key: 'fastestText', bit: 8, label: '⚡ Texte ultra-rapide', def: false },
-    { type: 'tweak', key: 'nationalDex', bit: 128, label: '📕 Pokédex national au départ', def: false },
-    { type: 'tweak', key: 'bwExpPatch', bit: 1, label: "📈 Patch d'XP (scaling selon le niveau)", def: false }
+    { type: 'tweak', key: 'nationalDex', bit: 128, label: '📕 Pokédex national au départ', def: false }
   ] }
 ];
 

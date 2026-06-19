@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>SoulSync — maquette overlay N/B2</title>
+<style>
+  @font-face { font-family: 'PokemonDS'; src: url('assets/pokemon-ds.ttf') format('truetype'); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'PokemonDS', monospace;
+    /* fond façon écran d'équipe B2W2 : rouge sombre dégradé */
+    background: linear-gradient(160deg, #7a1420, #3a0a12 55%, #1c0509);
+    min-height: 100vh; padding: 26px; color: #fff;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px 22px; align-content: start;
+  }
+  /* ---- PANNEAU POKÉMON style Noir/Blanc 2 ---- */
+  .mon {
+    position: relative; height: 118px; padding: 10px 16px 10px 96px;
+    background: linear-gradient(180deg, #4b5158, #34383d 50%, #2a2d31);
+    border-radius: 14px;
+    /* liseré vert biseauté brillant */
+    border: 3px solid #173a17;
+    box-shadow:
+      inset 0 0 0 3px #8ed845,
+      inset 0 0 0 5px #5aa028,
+      inset 0 2px 0 6px rgba(255,255,255,.18),
+      0 4px 10px rgba(0,0,0,.45);
+  }
+  .mon.crit { box-shadow: inset 0 0 0 3px #ff5470, inset 0 0 0 5px #b3263c, inset 0 2px 0 6px rgba(255,255,255,.15), 0 4px 14px rgba(255,60,90,.4); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { box-shadow: inset 0 0 0 3px #ff8aa0, inset 0 0 0 5px #b3263c, inset 0 2px 0 6px rgba(255,255,255,.15), 0 0 22px rgba(255,60,90,.7); } }
+  .spr {
+    position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+    width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;
+  }
+  .spr img { max-width: 78px; max-height: 76px; image-rendering: pixelated; filter: drop-shadow(0 3px 2px rgba(0,0,0,.5)); }
+  .name { font-size: 26px; letter-spacing: .5px; color: #fff; text-shadow: 2px 2px 0 #1a1c1f; }
+  .sex { float: right; font-size: 24px; }
+  .sex.m { color: #5a9bff; } .sex.f { color: #ff6fa3; }
+  .hpline { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .hpL { font-size: 20px; font-style: italic; color: #f0c020; text-shadow: 1px 1px 0 #1a1c1f; }
+  .hptrack { flex: 1; height: 9px; background: #0c0e10; border-radius: 6px; box-shadow: inset 0 0 0 1.5px #c8c8c8; overflow: hidden; }
+  .hpfill { height: 100%; border-radius: 6px; background: linear-gradient(180deg, #8ff070, #3fb83f); }
+  .hpfill.mid { background: linear-gradient(180deg, #ffe14d, #e0b020); }
+  .hpfill.low { background: linear-gradient(180deg, #ff8a8a, #e03a3a); }
+  .foot { display: flex; justify-content: space-between; align-items: baseline; margin-top: 9px; }
+  .lv { font-size: 22px; color: #fff; text-shadow: 1px 1px 0 #1a1c1f; }
+  .num { font-size: 24px; color: #fff; text-shadow: 1px 1px 0 #1a1c1f; letter-spacing: 1px; }
+  /* badge de lien soul-link (doré, identique entre les 2 joueurs liés) */
+  .link {
+    position: absolute; left: -7px; top: -7px; z-index: 3;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffe89a, #f5c451 60%, #c8941f);
+    border: 2px solid #fff8e0; box-shadow: 0 2px 5px rgba(0,0,0,.5);
+    font-size: 16px; color: #5a3c00; display: flex; align-items: center; justify-content: center;
+    font-family: Arial, sans-serif; font-weight: 900;
+  }
+  .hdr { grid-column: 1 / -1; text-align: center; font-size: 18px; color: #ffd; opacity: .85; margin-bottom: 2px; font-family: Arial; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+  <div class="hdr">ÉQUIPE DE LÉA — style Noir/Blanc 2 (vrais sprites PokeAPI + police DS)</div>
+
+  <!-- 6 Pokémon réels, états variés -->
+  <div class="mon">
+    <div class="link">1</div>
+    <div class="spr"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/155.png" data-png="155"></div>
+    <div><span class="name">Braisette</span><span class="sex f">♀</span></div>
+    <div class="hpline"><span class="hpL">HP</span><div class="hptrack"><div class="hpfill" style="width:90%"></div></div></div>
+    <div class="foot"><span class="lv">Niv.49</span><span class="num">142/158</span></div>
+  </div>
+
+  <div class="mon">
+    <div class="link">2</div>
+    <div class="spr"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/4.png" data-png="4"></div>
+    <div><span class="name">Vortex</span><span class="sex m">♂</span></div>
+    <div class="hpline"><span class="hpL">HP</span><div class="hptrack"><div class="hpfill mid" style="width:42%"></div></div></div>
+    <div class="foot"><span class="lv">Niv.47</span><span class="num">63/151</span></div>
+  </div>
+
+  <div class="mon crit">
+    <div class="link">3</div>
+    <div class="spr"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/633.png" data-png="633"></div>
+    <div><span class="name">Mimine</span><span class="sex f">♀</span></div>
+    <div class="hpline"><span class="hpL">HP</span><div class="hptrack"><div class="hpfill low" style="width:9%"></div></div></div>
+    <div class="foot"><span class="lv">Niv.48</span><span class="num">9/144</span></div>
+  </div>
+
+  <div class="mon">
+    <div class="link">4</div>
+    <div class="spr"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/280.png" data-png="280"></div>
+    <div><span class="name">Klonk</span><span class="sex m">♂</span></div>
+    <div class="hpline"><span class="hpL">HP</span><div class="hptrack"><div class="hpfill" style="width:96%"></div></div></div>
+    <div class="foot"><span class="lv">Niv.46</span><span class="num">133/139</span></div>
+  </div>
+
+  <div class="mon">
+    <div class="link">5</div>
+    <div class="spr"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/246.png" data-png="246"></div>
+    <div><span class="name">Pétale</span><span class="sex f">♀</span></div>
+    <div class="hpline"><span class="hpL">HP</span><div class="hptrack"><div class="hpfill" style="width:87%"></div></div></div>
+    <div class="foot"><span class="lv">Niv.47</span><span class="num">128/147</span></div>
+  </div>
+
+  <div class="mon">
+    <div class="link">6</div>
+    <div class="spr"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/374.png" data-png="374"></div>
+    <div><span class="name">Zéphyr</span><span class="sex m">♂</span></div>
+    <div class="hpline"><span class="hpL">HP</span><div class="hptrack"><div class="hpfill" style="width:62%"></div></div></div>
+    <div class="foot"><span class="lv">Niv.48</span><span class="num">88/138</span></div>
+  </div>
+
+  <script>
+    // Repli sprite animé -> statique si le GIF ne charge pas (pour le screenshot)
+    document.querySelectorAll('.spr img').forEach((img) => {
+      img.addEventListener('error', function () {
+        this.src = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/' + this.dataset.png + '.png';
+      });
+    });
+  </script>
+</body>
+</html>
