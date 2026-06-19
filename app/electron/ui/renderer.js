@@ -505,7 +505,7 @@ function render() {
 
   for (let o = 1; o <= maxOrder; o++) {
     if (!players.some((id) => byPlayer[id][o])) continue;
-    html += `<div class="order-cell">#${o}</div>`;
+    html += `<div class="order-cell">🔗</div>`;
     for (const id of players) {
       const m = byPlayer[id][o];
       html += m ? monCard(m, id) : '<div class="mon empty"></div>';
@@ -537,44 +537,39 @@ function monCard(m, playerId) {
   const animated = `${SPR}/versions/generation-v/black-white/animated/${m.species}.gif`;
   const fb1 = `${SPR}/versions/generation-v/black-white/${m.species}.png`;
   const fb2 = `${SPR}/${m.species}.png`;
+  const hp = hpData(m);
   const dead = m.dead ? ' dead' : '';
   const boxed = (!m.dead && m.boxed) ? ' boxed' : '';
+  const crit = (!m.dead && !m.boxed && hp.pct > 0 && hp.pct <= 20) ? ' crit' : '';
   const badge = boxed ? '<div class="box-badge">📦 boîte</div>' : '';
+  const link = (m.order != null) ? `<div class="link-badge">${m.order}</div>` : '';
   // Bouton "ranimer" sur un mort, si on en a le droit (hôte/solo = tous, client = les siens).
   const canRevive = m.dead && (uiMode === 'host' || uiMode === 'solo' || playerId === me);
   const revive = canRevive
     ? `<button class="revive-btn" data-player="${esc(playerId)}" data-pid="${m.pid}" title="Ranimer ce Pokémon">💚 Ranimer</button>`
     : '';
-  return `<div class="mon${dead}${boxed}">
-    ${badge}
+  return `<div class="mon${dead}${boxed}${crit}">
+    ${link}${badge}
     <div class="mon-plate">
       <img class="mon-sprite" src="${animated}" data-fb1="${fb1}" data-fb2="${fb2}" alt="">
       ${revive}
     </div>
     <div class="mon-info">
       <div class="mon-name">${esc(m.name)}</div>
-      <div class="mon-lv">Niv. ${m.level != null ? m.level : '?'}</div>
-      ${hpBar(m)}
+      <div class="hpwrap"><span class="pv">HP</span><div class="hpbar"><i class="${hp.cls}" style="width:${hp.pct}%"></i></div></div>
+      <div class="mon-foot"><span class="mon-lv">Niv. ${m.level != null ? m.level : '?'}</span><span class="hpnum">${hp.label}</span></div>
     </div>
   </div>`;
 }
 
-function hpBar(m) {
-  let pct, label, cls;
-  if (m.dead) {
-    pct = 0; label = (m.maxhp ? '0/' + m.maxhp : '0'); cls = 'red';
-  } else if (m.hp != null && m.maxhp) {
-    pct = Math.max(0, Math.min(100, Math.round((m.hp / m.maxhp) * 100)));
-    label = m.hp + '/' + m.maxhp;
-    cls = pct > 50 ? 'green' : (pct > 20 ? 'yellow' : 'red');
-  } else {
-    pct = 100; label = ''; cls = 'green'; // pas encore de données PV
+// Calcule l'état de la barre de PV : pourcentage, libellé "h/m", couleur.
+function hpData(m) {
+  if (m.dead) return { pct: 0, label: (m.maxhp ? '0/' + m.maxhp : '0'), cls: 'red' };
+  if (m.hp != null && m.maxhp) {
+    const pct = Math.max(0, Math.min(100, Math.round((m.hp / m.maxhp) * 100)));
+    return { pct, label: m.hp + '/' + m.maxhp, cls: pct > 50 ? 'green' : (pct > 20 ? 'yellow' : 'red') };
   }
-  return `<div class="hpwrap">
-    <span class="pv">PV</span>
-    <div class="hpbar"><i class="${cls}" style="width:${pct}%"></i></div>
-    ${label ? `<span class="hpnum">${label}</span>` : ''}
-  </div>`;
+  return { pct: 100, label: '', cls: 'green' }; // pas encore de données PV
 }
 
 // ---------- NOTIFICATIONS ----------
